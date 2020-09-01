@@ -1,0 +1,5 @@
+(define (comb n r)
+  (cond ((or (< r 0) (> r n)) 0)
+        ((or (= r 1) (= r n)) 1)
+        (else (+ (comb (- n 1) (- r 1))
+                 (comb (- n 1) r)))))
