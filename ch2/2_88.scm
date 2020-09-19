@@ -11,7 +11,8 @@
 
 (define (negate-terms term-list)
   (map (lambda (t) (make-term (order t)
-                              (negate (coeff t))))))
+                              (negate (coeff t))))
+       term-list))
 (put 'negate '(polynomial)
      (lambda (p) (make-polynomial (variable p)
                                   (negate-terms (term-list p)))))
