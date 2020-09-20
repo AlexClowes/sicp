@@ -172,12 +172,11 @@
   (define (gcd-terms a b)
     (if (empty-termlist? b)
       a
-      (let* ((ps-rem (pseudoremainder-terms a b))
-             (coeffs (map coeff ps-rem))
-             (coeffs-gcd (apply gcd coeffs)))
-        (car (div-terms ps-rem
-                        (adjoin-term (make-term 0 coeffs-gcd)
-                                     (the-empty-termlist)))))))
+      (let ((result (gcd-terms b (pseudoremainder-terms a b))))
+        (let ((scaling (apply gcd (map coeff result))))
+          (car (div-terms result
+                          (adjoin-term (make-term 0 scaling)
+                                       (the-empty-termlist))))))))
   (define (remainder-terms a b)
     (cadr (div-terms a b)))
   (define (pseudoremainder-terms a b)
