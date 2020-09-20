@@ -207,11 +207,6 @@
 (define (make-polynomial variable terms)
   ((get 'make 'polynomial) variable terms))
 
-(define p1 (make-polynomial 'x '((4 1) (3 -1) (2 -2) (1 2))))
-(define p2 (make-polynomial 'x '((3 1) (1 -1))))
-(greatest-common-divisor p1 p2)
-; By hand, answer is x^2 - x, which matches up to a change of sign.
-
 (define p1 (make-polynomial 'x '((2 1) (1 -2) (0 1))))
 (define p2 (make-polynomial 'x '((2 11) (0 7))))
 (define p3 (make-polynomial 'x '((1 13) (0 5))))
