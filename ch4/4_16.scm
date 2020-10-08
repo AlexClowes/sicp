@@ -1,0 +1,50 @@
+(load "evaluator.scm")
+(define (lookup-variable-value var env)
+  (define (env-loop env)
+    (define (scan vars vals)
+      (cond ((null? vars)
+             (env-loop (enclosing-environment env)))
+            ((eq? var (car vars))
+             (let ((val (car vals)))
+               (if (eq? val '*unassigned*)
+                 (error "Unbound variable")
+                 val)))
+            (else (scan (cdr vars) (cdr vals)))))
+    (if (eq? env the-empty-environment)
+      (error "Unbound variable" var)
+      (let ((frame (first-frame env)))
+        (scan (frame-variables frame)
+              (frame-values frame)))))
+  (env-loop env))
+
+(define (make-assignment variable value)
+  (list 'set! variable value))
+
+(define (scan-out-defines exps)
+  (define (iter exps vars vals body)
+    (cond ((null? exps)
+           (map reverse (list vars vals body)))
+          ((definition? (car exps))
+           (let ((var (definition-variable (car exps)))
+                 (val (definition-value (car exps))))
+             (iter (cdr exps)
+                   (cons var vars)
+                   (cons val vals)
+                   body)))
+          (else (iter (cdr exps) vars vals (cons (car exps) body)))))
+  (let* ((l (iter exps '() '() '()))
+         (vars (car l))
+         (vals (cadr l))
+         (body (caddr l)))
+    (make-let vars
+              (map (lambda (v) '*unassigned*) vars)
+              (append (map make-assignment vars vals)
+                      body))))
+
+
+(define (make-procedure parameters body env)
+  (list 'procedure parameters (scan-out-defines body) env))
+
+; Better to install scan-out-defines in make-procedure, so that it is only run
+; once for each procedure definition, instead of being re-run on each call to
+; procedure-body.
